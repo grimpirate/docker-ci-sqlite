@@ -9,8 +9,8 @@ ARG tz_city=New_York
 ARG ci_subdir=sub
 ARG ci_baseurl=http://localhost
 
-# Install requirements for Codeigniter, MySQL and SQLite
-RUN apk add --no-cache apache2 php-apache2 php-pdo php-intl php-dom php-xml php-xmlwriter php-tokenizer php-ctype php-sqlite3 php-session composer sqlite nano tzdata php-simplexml php-mysqli php-fpm php-pdo_mysql gd php-gd php-fileinfo php-xmlreader
+# Install requirements for Codeigniter and SQLite
+RUN apk add --no-cache nano tzdata sqlite composer apache2 php-apache2 php-intl php-ctype php-sqlite3 php-tokenizer php-session
 RUN rm -rf /var/cache/apk/*
 
 # Setup timezone (appropriate timezone necessary for Google 2FA)
