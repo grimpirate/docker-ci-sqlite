@@ -9,14 +9,6 @@ ARG tz_city=New_York
 ARG ci_subdir=sub
 ARG ci_baseurl=http://localhost
 
-# Environment variables for docker container (used by configure.sh)
-ENV docker_db_name=$db_name.db
-ENV docker_db_sessions=$db_sessions
-ENV docker_tz_country=$tz_country
-ENV docker_tz_city=$tz_city
-ENV docker_ci_subdir=$ci_subdir
-ENV docker_ci_baseurl=$ci_baseurl
-
 # Install requirements for Codeigniter, MySQL and SQLite
 RUN apk add --no-cache apache2 php-apache2 php-pdo php-intl php-dom php-xml php-xmlwriter php-tokenizer php-ctype php-sqlite3 php-session composer sqlite nano tzdata php-simplexml php-mysqli php-fpm php-pdo_mysql gd php-gd php-fileinfo php-xmlreader
 RUN rm -rf /var/cache/apk/*
@@ -97,7 +89,6 @@ RUN echo "docker.tz_country=${tz_country}">> $ci_subdir/.env
 RUN echo "docker.tz_city=${tz_city}">> $ci_subdir/.env
 RUN echo "docker.ci_subdir=${ci_subdir}">> $ci_subdir/.env
 RUN echo "docker.ci_baseurl=${ci_baseurl}">> $ci_subdir/.env
-RUN echo "docker.utm_empty=${utm_empty}">> $ci_subdir/.env
 
 # Disable Session Handler info message (NOTE MODIFYING VENDOR DIRECTLY, THIS IS DANGEROUS)
 RUN sed -i "s/\$this->logger->info/\/\/\$this->logger->info/" vendor/codeigniter4/framework/system/Session/Session.php
