@@ -36,11 +36,11 @@ class Registrar
 						'except' => [
 							'login*',
 							'register',
-							'auth/a/*'
-						]
-					]
+							'auth/a/*',
+						],
+					],
 				],
-			]
+			],
 		];
 	}
 
