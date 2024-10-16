@@ -94,7 +94,7 @@ RUN echo "docker.ci_baseurl=${ci_baseurl}">> $ci_subdir/.env
 RUN sed -i "s/\$this->logger->info/\/\/\$this->logger->info/" vendor/codeigniter4/framework/system/Session/Session.php
 # Modify DatabaseHandler to function with SQLite3 (NOTE MODIFYING VENDOR DIRECTLY, THIS IS DANGEROUS)
 RUN sed -i "s/'now()'/'CURRENT_TIMESTAMP'/g" vendor/codeigniter4/framework/system/Session/Handlers/DatabaseHandler.php
-RUN sed -i "s/\"now() - INTERVAL {\$interval}\"/\"datetime('now', '-{\$max_lifetime} second')\"/" vendor/codeigniter4/framework/system/Session/Handlers/DatabaseHandler.php
+RUN sed -i "s/\"now() - INTERVAL {\$interval}\"/match (config(Database::class)->{\$this->DBGroup}['DBDriver']) {\n\t\t\t\t'SQLite3' => \"datetime('now', '-{\$max_lifetime} second')\",\n\t\t\t\tdefault   => \"now() - INTERVAL {\$max_lifetime} second\",\n\t\t\t}/" vendor/codeigniter4/framework/system/Session/Handlers/DatabaseHandler.php
 
 # Copy our custom site logic
 ADD --chown=apache:apache app $ci_subdir/app
