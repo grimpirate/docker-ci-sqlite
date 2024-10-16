@@ -69,4 +69,13 @@ class Registrar
 			'supportedLocales' => ['en'],
 		];
 	}
+
+	public static function Session(): array
+	{
+		return [
+			'driver' => \CodeIgniter\Session\Handlers\DatabaseHandler::class,
+			'savePath' => $_ENV['docker.db_sessions'],
+			'matchIP' => true
+		];
+	}
 }

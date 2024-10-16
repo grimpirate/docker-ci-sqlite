@@ -92,6 +92,9 @@ RUN echo "docker.ci_baseurl=${ci_baseurl}">> $ci_subdir/.env
 
 # Disable Session Handler info message (NOTE MODIFYING VENDOR DIRECTLY, THIS IS DANGEROUS)
 RUN sed -i "s/\$this->logger->info/\/\/\$this->logger->info/" vendor/codeigniter4/framework/system/Session/Session.php
+# Modify DatabaseHandler to function with SQLite3 (NOTE MODIFYING VENDOR DIRECTLY, THIS IS DANGEROUS)
+RUN sed -i "s/'now()'/'CURRENT_TIMESTAMP'/g" vendor/codeigniter4/framework/system/Session/Handlers/DatabaseHandler.php
+RUN sed -i "s/\"now() - INTERVAL {\$interval}\"/\"datetime('now', '-{\$max_lifetime} second')\"/" vendor/codeigniter4/framework/system/Session/Handlers/DatabaseHandler.php
 
 # Copy our custom site logic
 ADD --chown=apache:apache app $ci_subdir/app
