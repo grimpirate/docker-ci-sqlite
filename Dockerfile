@@ -11,12 +11,14 @@ ARG ci_baseurl=http://localhost
 
 # Install requirements for Codeigniter and SQLite
 RUN apk add --no-cache nano tzdata sqlite composer apache2 php-apache2 php-intl php-ctype php-sqlite3 php-tokenizer php-session
+# Clear Alpine package cache
 RUN rm -rf /var/cache/apk/*
 
 # Setup timezone (appropriate timezone necessary for Google 2FA)
 RUN cp /usr/share/zoneinfo/$tz_country/$tz_city /etc/localtime
 RUN echo "${tz_country}/${tz_city}" > /etc/timezone
 RUN sed -i "s/;date.timezone =/date.timezone = \"${tz_country}\/${tz_city}\"/" /etc/php*/php.ini
+# Increase PHP memory limit
 RUN sed -i "s/memory_limit = 128M/memory_limit = 1024M/" /etc/php*/php.ini
 
 # Fully qualified ServerName
@@ -46,6 +48,17 @@ RUN mkdir $ci_subdir
 
 # Composer install CodeIgniter 4 framework
 RUN composer require codeigniter4/framework
+
+### MODIFYING VENDOR FILES DIRECTLY IS DANGEROUS!!! ###
+
+# Disable Session Handler info message
+RUN sed -i "s/\$this->logger->info/\/\/\$this->logger->info/" vendor/codeigniter4/framework/system/Session/Session.php
+# Modify DatabaseHandler to use CURRENT_TIMESTAMP instead of now()
+RUN sed -i "s/'now()'/'CURRENT_TIMESTAMP'/g" vendor/codeigniter4/framework/system/Session/Handlers/DatabaseHandler.php
+# Modify DatabaseHandler to provide for SQLite timestamp calculations for session garbage collection
+RUN sed -i "s/\"now() - INTERVAL {\$interval}\"/match (config(Database::class)->{\$this->DBGroup}['DBDriver']) {\n                'SQLite3' => \"datetime('now', '-{\$max_lifetime} second')\",\n                default   => \"now() - INTERVAL {\$max_lifetime} second\",\n            }/" vendor/codeigniter4/framework/system/Session/Handlers/DatabaseHandler.php
+
+### MODIFYING VENDOR FILES DIRECTLY IS DANGEROUS!!! ###
 
 # Copy files from framework into subdirectory
 RUN cp -R vendor/codeigniter4/framework/app $ci_subdir/.
@@ -90,31 +103,20 @@ RUN echo "docker.tz_city=${tz_city}">> $ci_subdir/.env
 RUN echo "docker.ci_subdir=${ci_subdir}">> $ci_subdir/.env
 RUN echo "docker.ci_baseurl=${ci_baseurl}">> $ci_subdir/.env
 
-# Disable Session Handler info message (NOTE MODIFYING VENDOR DIRECTLY, THIS IS DANGEROUS)
-RUN sed -i "s/\$this->logger->info/\/\/\$this->logger->info/" vendor/codeigniter4/framework/system/Session/Session.php
-# Modify DatabaseHandler to function with SQLite3 (NOTE MODIFYING VENDOR DIRECTLY, THIS IS DANGEROUS)
-RUN sed -i "s/'now()'/'CURRENT_TIMESTAMP'/g" vendor/codeigniter4/framework/system/Session/Handlers/DatabaseHandler.php
-RUN sed -i "s/\"now() - INTERVAL {\$interval}\"/match (config(Database::class)->{\$this->DBGroup}['DBDriver']) {\n                'SQLite3' => \"datetime('now', '-{\$max_lifetime} second')\",\n                default   => \"now() - INTERVAL {\$max_lifetime} second\",\n            }/" vendor/codeigniter4/framework/system/Session/Handlers/DatabaseHandler.php
-
 # Copy our custom site logic
 ADD --chown=apache:apache app $ci_subdir/app
 # ADD --chown=apache:apache public $ci_subdir/public
 
-# </Custom Site Setup>
-
 # Create SQLite database(s)
 RUN php $ci_subdir/spark db:create $db_name --ext db
-RUN php $ci_subdir/spark db:create app --ext db
 
 # Setup shield using spark and answer yes to migration question
 RUN yes | php $ci_subdir/spark shield:setup
 
-# Initial setup
-RUN php $ci_subdir/spark setup:initial
-
 # Post setup clean up
-# RUN rm -rf $ci_subdir/app/Commands
-# RUN rm -rf $ci_subdir/public/favicon.ico
+RUN rm -rf $ci_subdir/public/favicon.ico
+
+# </Custom Site Setup>
 
 USER root
 

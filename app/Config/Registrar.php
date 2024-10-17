@@ -51,10 +51,6 @@ class Registrar
 				'database' => $_ENV['docker.db_name'],
 				'DBDriver' => 'SQLite3',
 			],
-			'app' => [
-				'database' => 'app.db',
-				'DBDriver' => 'SQLite3',
-			],
 		];
 	}
 
