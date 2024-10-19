@@ -48,6 +48,17 @@ RUN mkdir $ci_subdir
 # Composer install CodeIgniter 4 framework
 RUN composer require codeigniter4/framework
 
+### MODIFYING VENDOR FILES DIRECTLY IS DANGEROUS!!! ###
+
+# Disable Session Handler info message
+RUN sed -i "s/\$this->logger->info/\/\/\$this->logger->info/" vendor/codeigniter4/framework/system/Session/Session.php
+# Modify DatabaseHandler to use CURRENT_TIMESTAMP instead of now()
+# RUN sed -i "s/'now()'/'CURRENT_TIMESTAMP'/g" vendor/codeigniter4/framework/system/Session/Handlers/DatabaseHandler.php
+# Modify DatabaseHandler to provide for SQLite timestamp calculations for session garbage collection
+# RUN sed -i "s/\"now() - INTERVAL {\$interval}\"/match (config(Database::class)->{\$this->DBGroup}['DBDriver']) {\n                'SQLite3' => \"datetime('now', '-{\$max_lifetime} second')\",\n                default   => \"now() - INTERVAL {\$max_lifetime} second\",\n            }/" vendor/codeigniter4/framework/system/Session/Handlers/DatabaseHandler.php
+
+### MODIFYING VENDOR FILES DIRECTLY IS DANGEROUS!!! ###
+
 # Copy files from framework into subdirectory
 RUN cp -R vendor/codeigniter4/framework/app $ci_subdir/.
 RUN cp -R vendor/codeigniter4/framework/public $ci_subdir/.
