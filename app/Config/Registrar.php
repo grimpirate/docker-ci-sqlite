@@ -20,9 +20,8 @@ class Registrar
 
 	public static function Filters(): array
 	{
-		// Protects all site pages
-		// Disables CodeIgniter4 toolbar in development mode
 		return [
+			// Disables CodeIgniter4 toolbar in development mode
 			'required' => [
 				'after' => [
 					'pagecache',	// Web Page Caching
@@ -30,6 +29,7 @@ class Registrar
 					//'toolbar',		// Debug Toolbar
 				],
 			],
+			// Protects all site pages
 			'globals' => [
 				'before' => [
 					'session' => [
