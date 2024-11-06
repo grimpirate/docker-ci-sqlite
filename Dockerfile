@@ -7,6 +7,7 @@ ARG tz_country=America
 ARG tz_city=New_York
 ARG ci_subdir=sub
 ARG ci_baseurl=http://localhost
+ARG ci_environment=development
 
 # Install requirements for Codeigniter and SQLite
 RUN apk add --no-cache nano tzdata sqlite composer apache2 php-apache2 php-intl php-ctype php-sqlite3 php-tokenizer php-session
@@ -79,7 +80,7 @@ RUN sed -i "s/\/..\/..\/tests/\/..\/..\/..\/tests/" $ci_subdir/app/Config/Paths.
 RUN sed -i "s/vendor\/autoload.php/..\/vendor\/autoload.php/" $ci_subdir/app/Config/Constants.php
 
 # Change environment to development
-RUN sed -i "s/# CI_ENVIRONMENT = production/CI_ENVIRONMENT = development/" $ci_subdir/.env
+RUN sed -i "s/# CI_ENVIRONMENT = production/CI_ENVIRONMENT = ${ci_environment}/" $ci_subdir/.env
 
 # Set project minimum-stability to dev
 RUN composer config minimum-stability dev
