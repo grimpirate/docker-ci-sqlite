@@ -2,6 +2,7 @@
 FROM alpine
 
 # Configurable build time variables
+ARG user=apache
 ARG db_name=auth
 ARG tz_country=America
 ARG tz_city=New_York
@@ -10,7 +11,14 @@ ARG ci_baseurl=http://localhost
 ARG ci_environment=development
 
 # Install requirements for Codeigniter and SQLite
-RUN apk add --no-cache nano tzdata sqlite composer apache2 php-apache2 php-intl php-ctype php-sqlite3 php-tokenizer php-session
+RUN apk add --no-cache nano tzdata sqlite composer php-intl php-ctype php-sqlite3 php-tokenizer php-session
+RUN\
+	if [ "${user}" == "apache" ]; then \
+		apk add --no-cache apache2 php-apache2; \
+	else \
+		apk add --no-cache nginx php php-fpm; \
+	fi
+
 # Clear Alpine package cache
 RUN rm -rf /var/cache/apk/*
 
@@ -22,11 +30,20 @@ RUN sed -i "s/;date.timezone =/date.timezone = \"${tz_country}\/${tz_city}\"/" /
 RUN sed -i "s/memory_limit = 128M/memory_limit = 1024M/" /etc/php*/php.ini
 
 # Fully qualified ServerName
-RUN sed -i "s/#ServerName.*/ServerName 127.0.0.1/" /etc/apache2/httpd.conf
+RUN\
+	if [ "${user}" == "apache" ]; then \
+		sed -i "s/#ServerName.*/ServerName 127.0.0.1/" /etc/apache2/httpd.conf; \
+	fi
 # Enable mod_rewrite in apache (for .htaccess to function correctly)
-RUN sed -i "s/#LoadModule rewrite_module/LoadModule rewrite_module/" /etc/apache2/httpd.conf
+RUN\
+	if [ "${user}" == "apache" ]; then \
+		sed -i "s/#LoadModule rewrite_module/LoadModule rewrite_module/" /etc/apache2/httpd.conf; \
+	fi
 # AllowOverride All for .htaccess directives to supercede defaults
-RUN sed -i "s/AllowOverride None/AllowOverride All/" /etc/apache2/httpd.conf
+RUN\
+	if [ "${user}" == "apache" ]; then \
+		sed -i "s/AllowOverride None/AllowOverride All/" /etc/apache2/httpd.conf; \
+	fi
 
 # <CodeIgniter 4 Default Setup>
 
@@ -36,12 +53,18 @@ WORKDIR /var/www/localhost/htdocs
 RUN rm -rf *
 
 # Change htdocs folder group:user
-RUN chown apache:apache /var/www/localhost/htdocs
+RUN chown $user:$user /var/www/localhost/htdocs
 
 # Change web folder from /var/www/localhost/htdocs to CodeIgniter public folder
-RUN sed -i "s/htdocs/htdocs\/${ci_subdir}\/public/" /etc/apache2/httpd.conf
+RUN\
+	if [ "${user}" == "apache" ]; then \
+		sed -i "s/htdocs/htdocs\/${ci_subdir}\/public/" /etc/apache2/httpd.conf; \
+	else \
+		mkdir -p /etc/nginx/http.d; \
+	fi
+ADD nginx/default.conf /etc/nginx/http.d/default.conf
 
-USER apache
+USER $user
 
 # Create subdirectory
 RUN mkdir $ci_subdir
@@ -103,8 +126,8 @@ RUN echo "docker.ci_subdir=${ci_subdir}">> $ci_subdir/.env
 RUN echo "docker.ci_baseurl=${ci_baseurl}">> $ci_subdir/.env
 
 # Copy our custom site logic
-ADD --chown=apache:apache app $ci_subdir/app
-# ADD --chown=apache:apache public $ci_subdir/public
+ADD --chown=$user:$user app $ci_subdir/app
+# ADD --chown=$user:$user public $ci_subdir/public
 
 # Create SQLite database(s)
 RUN php $ci_subdir/spark db:create $db_name --ext db
@@ -115,6 +138,11 @@ RUN yes | php $ci_subdir/spark shield:setup
 # Post setup clean up
 RUN rm -rf $ci_subdir/public/favicon.ico
 
+RUN\
+	if [ "${user}" == "nginx" ]; then \
+		chmod -R 0777 /var/www/localhost/htdocs/writable; \
+	fi
+
 # </Custom Site Setup>
 
 USER root
@@ -122,8 +150,10 @@ USER root
 # Set up volume into htdocs directory
 VOLUME ["/var/www/localhost/htdocs"]
 
+ENV GRIMUSER=$user
+
 # Run configure.sh
-ENTRYPOINT ["sh", "-c", "httpd -k start & tail -f /dev/null"]
+ENTRYPOINT ["sh", "-c", "if [ \"$GRIMUSER\" == 'apache' ]; then httpd -k start & tail -f /dev/null; else php-fpm83 & nginx -g 'daemon off;'; fi"]
 
 # Expose port 80 for external access
 EXPOSE 80

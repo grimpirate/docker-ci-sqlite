@@ -3,6 +3,5 @@ CodeIgniter with SQLite on Docker
 
 ## To use nginx
 ```
-mv nginx/* .
-docker build -t <name> .
+docker build --build-arg user=nginx -t <name> .
 ```
