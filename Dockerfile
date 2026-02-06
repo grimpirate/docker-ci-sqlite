@@ -66,8 +66,10 @@ ADD nginx/default.conf /etc/nginx/http.d/default.conf
 
 USER $user
 
-# Create subdirectory
+# Create subdirectories
 RUN mkdir -p $ci_subdir/modules
+RUN mkdir -p $ci_subdir/app/Config
+RUN mkdir -p $ci_subdir/public
 
 # Composer install CodeIgniter 4 framework
 RUN composer require codeigniter4/framework
@@ -84,8 +86,80 @@ RUN sed -i "s/\$this->logger->info/\/\/\$this->logger->info/" vendor/codeigniter
 ### MODIFYING VENDOR FILES DIRECTLY IS DANGEROUS!!! ###
 
 # Copy files from framework into subdirectory
-RUN cp -R vendor/codeigniter4/framework/app $ci_subdir/.
-RUN cp -R vendor/codeigniter4/framework/public $ci_subdir/.
+RUN cp -R vendor/codeigniter4/framework/app/Config/Autoload.php $ci_subdir/app/Config/.
+RUN cp -R vendor/codeigniter4/framework/app/Config/Constants.php $ci_subdir/app/Config/.
+RUN cp -R vendor/codeigniter4/framework/app/Config/Paths.php $ci_subdir/app/Config/.
+RUN cp -R vendor/codeigniter4/framework/public/index.php $ci_subdir/public/.
+
+# Symlink all remaining framework app/Config/ files
+WORKDIR /var/www/localhost/htdocs/$ci_subdir/app/Config
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Boot
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/App.php
+# RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Autoload.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/CURLRequest.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Cache.php
+# RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Constants.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/ContentSecurityPolicy.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Cookie.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Cors.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Database.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/DocTypes.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Email.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Encryption.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Events.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Exceptions.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Feature.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Filters.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/ForeignCharacters.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Format.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Generators.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Honeypot.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Hostnames.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Images.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Kint.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Logger.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Migrations.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Mimes.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Modules.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Optimize.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Pager.php
+# RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Paths.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Publisher.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Routes.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Routing.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Security.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Services.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Session.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Toolbar.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/UserAgents.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Validation.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/View.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/WorkerMode.php
+
+# Symlink all remaining framework app/ files
+WORKDIR /var/www/localhost/htdocs/$ci_subdir/app
+# RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Controllers
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Database
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Filters
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Helpers
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Language
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Libraries
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Models
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/ThirdParty
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Views
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/.htaccess
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Common.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/index.html
+
+# Symlink all remaining framework public/ files
+WORKDIR /var/www/localhost/htdocs/$ci_subdir/public
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/public/.htaccess
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/public/favicon.ico
+# RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/public/index.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/public/robots.txt
+
+WORKDIR /var/www/localhost/htdocs
 
 # Use writable at the framework level rather than subdirectory level
 RUN cp -R vendor/codeigniter4/framework/writable .
