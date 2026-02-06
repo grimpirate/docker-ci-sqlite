@@ -74,7 +74,6 @@ RUN cp vendor/codeigniter4/framework/spark $ci_subdir/.
 # Modify default app paths to be one level higher
 RUN sed -i "s/\/..\/..\/system/\/..\/..\/..\/vendor\/codeigniter4\/framework\/system/" $ci_subdir/app/Config/Paths.php
 RUN sed -i "s/\/..\/..\/writable/\/..\/..\/..\/writable/" $ci_subdir/app/Config/Paths.php
-RUN sed -i "s/\/..\/..\/tests/\/..\/..\/..\/tests/" $ci_subdir/app/Config/Paths.php
 
 # Modify composer path to be one level higher
 RUN sed -i "s/vendor\/autoload.php/..\/vendor\/autoload.php/" $ci_subdir/app/Config/Constants.php
