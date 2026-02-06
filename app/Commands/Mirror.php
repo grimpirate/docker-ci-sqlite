@@ -27,8 +27,7 @@ class Mirror extends BaseCommand
 			symlink($path, preg_replace('/^(.*\/)([^\/]+)(\/app\/.*)$/', '$1mirror$3', $path));
 
 		foreach(array_filter($root, function($path) {
-			if(1 === preg_match('/^.*\/app\/Config\/Paths\.php$/', $path)) return false;
-			if(1 === preg_match('/^.*\/app\/Config\/Registrar\.php$/', $path)) return false;
+			if(1 === preg_match('/^.*\/app\/Config\/(?:Constants|Paths|Registrar)\.php$/', $path)) return false;
 			if(1 === preg_match('/^.*\/app\/Config\/[^\/]+$/', $path)) return true;
 			return false;
 		}) as $path)
@@ -42,8 +41,7 @@ class Mirror extends BaseCommand
 			symlink($path, preg_replace('/^(.*\/)([^\/]+)(\/public\/.*)$/', '$1mirror$3', $path));
 
 		foreach(array_filter($root, function($path) {
-			if(1 === preg_match('/^.*\/app\/Config\/Paths\.php$/', $path)) return true;
-			if(1 === preg_match('/^.*\/app\/Config\/Registrar\.php$/', $path)) return true;
+			if(1 === preg_match('/^.*\/app\/Config\/(?:Constants|Paths|Registrar)\.php$/', $path)) return true;
 			return false;
 		}) as $path)
 			copy($path, preg_replace('/^(.*\/)([^\/]+)(\/app\/.*)$/', '$1mirror$3', $path));
@@ -55,11 +53,10 @@ class Mirror extends BaseCommand
 			copy($path, preg_replace('/^(.*\/)([^\/]+)(\/public\/.*)$/', '$1mirror$3', $path));
 
 		foreach(array_filter($root, function($path) {
-			if(1 === preg_match('/^.*\/\.env$/', $path)) return true;
-			
+			if(1 === preg_match('/^.*\/(?:\.env|spark)$/', $path)) return true;
 			return false;
 		}) as $path)
-			copy($path, preg_replace('/^(.*\/)([^\/]+)(\/\.env)$/', '$1mirror$3', $path));
+			copy($path, preg_replace('/^(.*\/)([^\/]+)(\/(?:\.env|spark))$/', '$1mirror$3', $path));
 	}
 
 	public static function listAllFiles($dir)
