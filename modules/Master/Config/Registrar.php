@@ -62,7 +62,7 @@ class Registrar
 			'baseURL' => $_ENV['docker.ci_baseurl'],
 			'defaultLocale' => 'en',
 			'negotiateLocale' => true,
-			'supportedLocales' => ['en'],
+			//'supportedLocales' => ['en'],	// English locale supported by default
 		];
 	}
 }
