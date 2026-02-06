@@ -44,7 +44,7 @@ RUN sed -i "s/htdocs/htdocs\/${ci_subdir}\/public/" /etc/apache2/httpd.conf
 USER apache
 
 # Create subdirectory
-RUN mkdir $ci_subdir
+RUN mkdir -p $ci_subdir/modules
 
 # Composer install CodeIgniter 4 framework
 RUN composer require codeigniter4/framework
@@ -78,6 +78,9 @@ RUN sed -i "s/\/..\/..\/writable/\/..\/..\/..\/writable/" $ci_subdir/app/Config/
 # Modify composer path to be one level higher
 RUN sed -i "s/vendor\/autoload.php/..\/vendor\/autoload.php/" $ci_subdir/app/Config/Constants.php
 
+# Modify Autoload with Master module namespace
+RUN sed -i "s/APP_NAMESPACE => APPPATH,/APP_NAMESPACE => APPPATH,\n\t\t'Modules\\\\Master' => ROOTPATH . 'modules\/Master',/" $ci_subdir/app/Config/Autoload.php
+
 # Change environment to development
 RUN sed -i "s/# CI_ENVIRONMENT = production/CI_ENVIRONMENT = ${ci_environment}/" $ci_subdir/.env
 
@@ -102,7 +105,8 @@ RUN echo "docker.ci_subdir=${ci_subdir}">> $ci_subdir/.env
 RUN echo "docker.ci_baseurl=${ci_baseurl}">> $ci_subdir/.env
 
 # Copy our custom site logic
-ADD --chown=apache:apache app $ci_subdir/app
+ADD --chown=$user:$user modules $ci_subdir/modules
+# ADD --chown=apache:apache app $ci_subdir/app
 # ADD --chown=apache:apache public $ci_subdir/public
 
 # Create SQLite database(s)

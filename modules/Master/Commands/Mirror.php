@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Commands;
+namespace Modules\Master\Commands;
 
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
