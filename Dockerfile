@@ -12,6 +12,8 @@ ARG ci_environment=development
 
 # Install requirements for Codeigniter and SQLite
 RUN apk add --no-cache nano tzdata sqlite composer php-intl php-ctype php-sqlite3 php-tokenizer php-session
+# Needed for grimpirate/halberd package
+RUN apk add php-xmlwriter
 RUN\
 	if [ "${user}" == "apache" ]; then \
 		apk add --no-cache apache2 php-apache2; \
