@@ -73,7 +73,7 @@ RUN composer require codeigniter4/framework
 ### MODIFYING VENDOR FILES DIRECTLY IS DANGEROUS!!! ###
 
 # Disable Session Handler info message
-RUN sed -i "s/\$this->logger->info/\/\/\$this->logger->info/" vendor/codeigniter4/framework/system/Session/Session.php
+# RUN sed -i "s/\$this->logger->info/\/\/\$this->logger->info/" vendor/codeigniter4/framework/system/Session/Session.php
 # Modify DatabaseHandler to use CURRENT_TIMESTAMP instead of now()
 # RUN sed -i "s/'now()'/'CURRENT_TIMESTAMP'/g" vendor/codeigniter4/framework/system/Session/Handlers/DatabaseHandler.php
 # Modify DatabaseHandler to provide for SQLite timestamp calculations for session garbage collection
