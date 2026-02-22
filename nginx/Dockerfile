@@ -118,7 +118,7 @@ RUN echo "docker.ci_subdir=${ci_subdir}">> $ci_subdir/.env
 RUN echo "docker.ci_baseurl=${ci_baseurl}">> $ci_subdir/.env
 
 # Copy our custom site logic
-ADD --chown=$user:$user modules $ci_subdir/modules
+ADD --chown=nginx:nginx modules $ci_subdir/modules
 # ADD --chown=nginx:nginx app $ci_subdir/app
 # ADD --chown=nginx:nginx public $ci_subdir/public
 

@@ -31,19 +31,13 @@ RUN sed -i "s/;date.timezone =/date.timezone = \"${tz_country}\/${tz_city}\"/" /
 # Increase PHP memory limit
 RUN sed -i "s/memory_limit = 128M/memory_limit = 1024M/" /etc/php*/php.ini
 
+RUN\
+	if [ "${user}" == "apache" ]; then \
 # Fully qualified ServerName
-RUN\
-	if [ "${user}" == "apache" ]; then \
 		sed -i "s/#ServerName.*/ServerName 127.0.0.1/" /etc/apache2/httpd.conf; \
-	fi
 # Enable mod_rewrite in apache (for .htaccess to function correctly)
-RUN\
-	if [ "${user}" == "apache" ]; then \
 		sed -i "s/#LoadModule rewrite_module/LoadModule rewrite_module/" /etc/apache2/httpd.conf; \
-	fi
 # AllowOverride All for .htaccess directives to supercede defaults
-RUN\
-	if [ "${user}" == "apache" ]; then \
 		sed -i "s/AllowOverride None/AllowOverride All/" /etc/apache2/httpd.conf; \
 	fi
 
