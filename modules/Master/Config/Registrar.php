@@ -65,4 +65,18 @@ class Registrar
 			//'supportedLocales' => ['en'],	// English locale supported by default
 		];
 	}
+
+	public static function Exceptions(): array
+	{
+		return [
+			'errorViewPath' => ROOTPATH . 'modules/Master/Views/errors',
+		];
+	}
+
+	public static function Routing(): array
+	{
+		return [
+			'defaultNamespace' => 'Modules\Master\Controllers',
+		];
+	}
 }

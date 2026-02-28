@@ -61,6 +61,8 @@ RUN composer require codeigniter4/framework
 RUN cp -R vendor/codeigniter4/framework/app/Config/Autoload.php $ci_subdir/app/Config/.
 RUN cp -R vendor/codeigniter4/framework/app/Config/Constants.php $ci_subdir/app/Config/.
 RUN cp -R vendor/codeigniter4/framework/app/Config/Paths.php $ci_subdir/app/Config/.
+RUN echo -e "<?php\n\n" > $ci_subdir/app/Config/Routes.php
+RUN cp -R vendor/codeigniter4/framework/app/Controllers $ci_subdir/app/
 RUN cp -R vendor/codeigniter4/framework/public/index.php $ci_subdir/public/.
 
 # Symlink framework app/ files
@@ -119,6 +121,7 @@ RUN echo "docker.ci_baseurl=${ci_baseurl}">> $ci_subdir/.env
 
 # Copy our custom site logic
 ADD --chown=nginx:nginx modules $ci_subdir/modules
+RUN cp -R vendor/codeigniter4/framework/app/Views $ci_subdir/modules/Master
 # ADD --chown=nginx:nginx app $ci_subdir/app
 # ADD --chown=nginx:nginx public $ci_subdir/public
 
@@ -130,6 +133,15 @@ RUN yes | php $ci_subdir/spark shield:setup
 
 # Post setup clean up
 RUN rm -rf $ci_subdir/public/favicon.ico
+RUN rm -rf $ci_subdir/app/Controllers/Home.php
+RUN rm -rf $ci_subdir/app/Database
+RUN rm -rf $ci_subdir/app/Filters
+RUN rm -rf $ci_subdir/app/Helpers
+RUN rm -rf $ci_subdir/app/Language
+RUN rm -rf $ci_subdir/app/Libraries
+RUN rm -rf $ci_subdir/app/Models
+RUN rm -rf $ci_subdir/app/ThirdParty
+RUN rm -rf $ci_subdir/app/Views
 
 RUN chmod -R 0777 /var/www/localhost/htdocs/writable
 
