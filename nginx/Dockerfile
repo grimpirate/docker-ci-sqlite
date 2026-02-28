@@ -79,6 +79,9 @@ RUN find /var/www/localhost/htdocs/vendor/codeigniter4/framework/public/ -mindep
 
 WORKDIR /var/www/localhost/htdocs
 
+# Shift .htaccess and index.html from app
+RUN mv $ci_subdir/app/.htaccess $ci_subdir/app/index.html $ci_subdir
+
 # Use writable at the framework level rather than subdirectory level
 RUN cp -R vendor/codeigniter4/framework/writable .
 
