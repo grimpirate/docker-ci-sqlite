@@ -39,7 +39,7 @@ ADD default.conf /etc/nginx/http.d/default.conf
 USER nginx
 
 # Create subdirectories
-RUN mkdir -p $ci_subdir/modules
+RUN mkdir -p $ci_subdir/modules/master/src
 RUN mkdir -p $ci_subdir/app/Config
 RUN mkdir -p $ci_subdir/public
 
@@ -97,7 +97,7 @@ RUN sed -i "s/\/..\/..\/writable/\/..\/..\/..\/writable/" $ci_subdir/app/Config/
 RUN sed -i "s/vendor\/autoload.php/..\/vendor\/autoload.php/" $ci_subdir/app/Config/Constants.php
 
 # Modify Autoload with Master module namespace
-RUN sed -i "s/APP_NAMESPACE => APPPATH,/APP_NAMESPACE => APPPATH,\n\t\t'Modules\\\\Master' => ROOTPATH . 'modules\/Master',/" $ci_subdir/app/Config/Autoload.php
+RUN sed -i "s/APP_NAMESPACE => APPPATH,/APP_NAMESPACE => APPPATH,\n\t\t'Modules\\\\Master' => ROOTPATH . 'modules\/master\/src',/" $ci_subdir/app/Config/Autoload.php
 
 # Change environment to development
 RUN sed -i "s/# CI_ENVIRONMENT = production/CI_ENVIRONMENT = ${ci_environment}/" $ci_subdir/.env
@@ -123,8 +123,8 @@ RUN echo "docker.ci_subdir=${ci_subdir}">> $ci_subdir/.env
 RUN echo "docker.ci_baseurl=${ci_baseurl}">> $ci_subdir/.env
 
 # Copy our custom site logic
-ADD --chown=nginx:nginx modules $ci_subdir/modules
-RUN cp -R vendor/codeigniter4/framework/app/Views $ci_subdir/modules/Master
+ADD --chown=nginx:nginx src $ci_subdir/modules/master/src
+RUN cp -R vendor/codeigniter4/framework/app/Views $ci_subdir/modules/master/src
 # ADD --chown=nginx:nginx app $ci_subdir/app
 # ADD --chown=nginx:nginx public $ci_subdir/public
 
