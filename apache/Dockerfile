@@ -69,6 +69,7 @@ RUN cp -R vendor/codeigniter4/framework/app/Config/Autoload.php $ci_subdir/app/C
 RUN cp -R vendor/codeigniter4/framework/app/Config/Constants.php $ci_subdir/app/Config/.
 RUN cp -R vendor/codeigniter4/framework/app/Config/Paths.php $ci_subdir/app/Config/.
 RUN echo -e "<?php\n\n" > $ci_subdir/app/Config/Routes.php
+RUN cp -R vendor/codeigniter4/framework/app/Config/Security.php $ci_subdir/app/Config/.
 RUN cp -R vendor/codeigniter4/framework/public/index.php $ci_subdir/public/.
 
 # Symlink framework app/ files
@@ -142,6 +143,8 @@ RUN yes | php $ci_subdir/spark shield:setup
 
 # Post setup clean up
 RUN rm -rf $ci_subdir/public/favicon.ico
+RUN rm -rf $ci_subdir/app/Config/Security.php
+RUN ln -s /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/Security.php $ci_subdir/app/Config
 RUN rm -rf $ci_subdir/app/Database
 RUN rm -rf $ci_subdir/app/Filters
 RUN rm -rf $ci_subdir/app/Helpers

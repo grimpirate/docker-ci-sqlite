@@ -6,7 +6,7 @@ class Registrar
 {
 	public static function Email(): array
 	{
-		// Required for spark migration to proceed successfully
+		// Required for shield:setup migrations to proceed successfully
 		return [
 			'fromEmail' => 'anonym@us.com',
 			'fromName' => 'anonym@us',
@@ -15,13 +15,15 @@ class Registrar
 
 	public static function Auth(): array
 	{
-		return ['allowRegistration' => true];
+		return [
+			'allowRegistration' => true,
+		];
 	}
 
 	public static function Filters(): array
 	{
 		return [
-			// Disables CodeIgniter4 toolbar in development mode
+			// Disables CodeIgniter4 toolbar
 			'required' => [
 				'after' => [
 					'pagecache',	// Web Page Caching
@@ -29,7 +31,7 @@ class Registrar
 					//'toolbar',		// Debug Toolbar
 				],
 			],
-			// Protects all site pages
+			// Protects all site pages with Shield
 			'globals' => [
 				'before' => [
 					'session' => [
@@ -44,8 +46,17 @@ class Registrar
 		];
 	}
 
+	public static function Security(): array
+	{
+		// Shield modifies app/Config/Security.php but should be something configurable in Registrar to maintain install parity
+		return [
+			'csrfProtection' => 'session',
+		];
+	}
+
 	public static function Database(): array
 	{
+		// SQLite .db file located in writable/ directory
 		return [
 			'default' => [
 				'database' => $_ENV['docker.db_name'],
