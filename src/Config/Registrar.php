@@ -76,9 +76,7 @@ class Registrar
 			'indexPage' => '',
 			'appTimezone' => $_ENV['docker.tz_country'] . '/' . $_ENV['docker.tz_city'],
 			'baseURL' => $_ENV['docker.ci_baseurl'],
-			'defaultLocale' => 'en',
 			'negotiateLocale' => true,
-			//'supportedLocales' => ['en'],	// English locale supported by default
 			'CSPEnabled' => true,
 			'forceGlobalSecureRequests' => true,
 		];
