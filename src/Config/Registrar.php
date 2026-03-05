@@ -13,13 +13,6 @@ class Registrar
 		];
 	}
 
-	public static function Auth(): array
-	{
-		return [
-			'allowRegistration' => true,
-		];
-	}
-
 	public static function Filters(): array
 	{
 		return [
