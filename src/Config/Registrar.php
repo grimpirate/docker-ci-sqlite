@@ -26,14 +26,15 @@ class Registrar
 			// Disables CodeIgniter4 toolbar
 			'required' => [
 				'after' => [
-					'pagecache',	// Web Page Caching
-					'performance',	// Performance Metrics
+					//'pagecache',	// Web Page Caching
+					//'performance',	// Performance Metrics
 					//'toolbar',		// Debug Toolbar
 				],
 			],
 			// Protects all site pages with Shield
 			'globals' => [
 				'before' => [
+					'csrf',
 					'session' => [
 						'except' => [
 							'login*',
@@ -41,6 +42,9 @@ class Registrar
 							'auth/a/*',
 						],
 					],
+				],
+				'after' => [
+					'secureheaders',
 				],
 			],
 		];
@@ -51,6 +55,7 @@ class Registrar
 		// Shield modifies app/Config/Security.php but should be something configurable in Registrar to maintain install parity
 		return [
 			'csrfProtection' => 'session',
+			'tokenRandomize' => true,
 		];
 	}
 
@@ -74,6 +79,41 @@ class Registrar
 			'defaultLocale' => 'en',
 			'negotiateLocale' => true,
 			//'supportedLocales' => ['en'],	// English locale supported by default
+			'CSPEnabled' => true,
+			'forceGlobalSecureRequests' => true,
+		];
+	}
+
+	public static function ContentSecurityPolicy(): array
+	{
+		return [
+			'reportOnly' => false,
+			'reportURI' => null,
+			'reportTo' => null,
+			'upgradeInsecureRequests' => true,
+			'defaultSrc' => 'none',
+			'scriptSrc' => 'strict-dynamic',
+			'scriptSrcElem' => 'strict-dynamic',
+			'scriptSrcAttr' => 'none',
+			'styleSrc' => 'self',
+			'styleSrcElem' => 'self',
+			'styleSrcAttr' => 'self',
+			'imageSrc' => 'self',
+			'baseURI' => 'none',
+			'childSrc' => 'none',
+			'connectSrc' => 'self',
+			'fontSrc' => 'none',
+			'formAction' => 'self',
+			'frameAncestors' => 'none',
+			'mediaSrc' => 'none',
+			'objectSrc' => 'none',
+			'manifestSrc' => 'none',
+			'workerSrc' => [],
+			'pluginTypes' => null,
+			'sandbox' => null,
+			'styleNonceTag' => '{csp-style-nonce}',
+			'scriptNonceTag' => '{csp-script-nonce}',
+			'autoNonce' => false,
 		];
 	}
 
