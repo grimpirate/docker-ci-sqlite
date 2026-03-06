@@ -71,7 +71,7 @@ class Registrar
 			'baseURL' => $_ENV['docker.ci_baseurl'],
 			'negotiateLocale' => true,
 			'CSPEnabled' => true,
-			'forceGlobalSecureRequests' => true,
+			'forceGlobalSecureRequests' => ENVIRONMENT === 'production',
 		];
 	}
 
