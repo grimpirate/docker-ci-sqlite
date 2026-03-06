@@ -111,7 +111,7 @@ class Registrar
 	public static function Exceptions(): array
 	{
 		return [
-			'errorViewPath' => ROOTPATH . 'modules/Master/Views/errors',
+			'errorViewPath' => ROOTPATH . 'modules/master/src/Views/errors',
 		];
 	}
 
