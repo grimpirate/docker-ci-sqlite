@@ -12,7 +12,7 @@ class Mirror extends BaseCommand
 
 	public function run(array $params)
 	{
-		$root = self::listAllFiles(ROOTPATH);
+		$root = static::listAllFiles(ROOTPATH);
 
 		mkdir(ROOTPATH . '../mirror');
 		mkdir(ROOTPATH . '../mirror/app');
@@ -61,7 +61,9 @@ class Mirror extends BaseCommand
 
 	public static function listAllFiles($dir)
 	{
-		$array = array_diff(scandir($dir), array('.', '..'));
+		$dir = rtrim(realpath($dir), "/\\") . DIRECTORY_SEPARATOR;
+		
+		$array = array_diff(scandir($dir), ['.', '..']);
 
 		foreach($array as &$item)
 			$item = $dir . $item;
@@ -70,7 +72,7 @@ class Mirror extends BaseCommand
 
 		foreach($array as $item)
 			if(is_dir($item))
-				$array = array_merge($array, self::listAllFiles($item . DIRECTORY_SEPARATOR));
+				$array = array_merge($array, static::listAllFiles($item . DIRECTORY_SEPARATOR));
 
 		return $array;
 	}
