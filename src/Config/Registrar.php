@@ -87,12 +87,12 @@ class Registrar
 			'scriptSrcElem' => 'strict-dynamic',
 			'scriptSrcAttr' => 'none',
 			'styleSrc' => 'self',
-			'styleSrcElem' => 'self',
+			'styleSrcElem' => ['self', 'cdn.jsdelivr.net'],	// cdn.jsdelivr.net included for shield
 			'styleSrcAttr' => 'self',
 			'imageSrc' => 'self',
 			'baseURI' => 'none',
 			'childSrc' => 'none',
-			'connectSrc' => 'self',
+			'connectSrc' => ['self', 'cdn.jsdelivr.net'],	// cdn.jsdelivr.net included for shield
 			'fontSrc' => 'none',
 			'formAction' => 'self',
 			'frameAncestors' => 'none',
