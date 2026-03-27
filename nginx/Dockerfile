@@ -102,7 +102,7 @@ RUN sed -i "s/vendor\/autoload.php/..\/vendor\/autoload.php/" $ci_subdir/app/Con
 RUN sed -i "s/APP_NAMESPACE => APPPATH,/APP_NAMESPACE => APPPATH,\n\t\t'Modules\\\\Master' => ROOTPATH . 'modules\/master\/src',/" $ci_subdir/app/Config/Autoload.php
 
 # Modify BaseController to apply nonces and CDNs
-RUN sed -i "s/'session'/'session');\n\n\t\t\$csp = \$response->getCSP();\n\n\t\t\$csp->addStyleSrcElem(\"nonce-\{\$csp->getStyleNonce()\}\");\n\t\t\$csp->addScriptSrcElem(\"nonce-\{\$csp->getScriptNonce()\}\");\n\n\t\t\$csp->addStyleSrcElem('cdn.jsdelivr.net');\n\t\t\$csp->addConnectSrc('cdn.jsdelivr.net'/" $ci_subdir/app/Controllers/BaseController.php
+#RUN sed -i "s/'session'/'session');\n\n\t\t\$csp = \$response->getCSP();\n\n\t\t\$csp->addStyleSrcElem(\"nonce-\{\$csp->getStyleNonce()\}\");\n\t\t\$csp->addScriptSrcElem(\"nonce-\{\$csp->getScriptNonce()\}\");\n\n\t\t\$csp->addStyleSrcElem('cdn.jsdelivr.net');\n\t\t\$csp->addConnectSrc('cdn.jsdelivr.net'/" $ci_subdir/app/Controllers/BaseController.php
 
 # Change environment to development
 RUN sed -i "s/# CI_ENVIRONMENT = production/CI_ENVIRONMENT = ${ci_environment}/" $ci_subdir/.env
