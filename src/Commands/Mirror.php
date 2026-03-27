@@ -14,10 +14,8 @@ class Mirror extends BaseCommand
 	{
 		$root = static::listAllFiles(ROOTPATH);
 
-		mkdir(ROOTPATH . '../mirror');
-		mkdir(ROOTPATH . '../mirror/app');
-		mkdir(ROOTPATH . '../mirror/app/Config');
-		mkdir(ROOTPATH . '../mirror/public');
+		mkdir(directory: ROOTPATH . '../mirror/app/Config', recursive: true);
+		mkdir(directory: ROOTPATH . '../mirror/public');
 
 		foreach(array_filter($root, function($path) {
 			if(1 === preg_match('/^.*\/app\/Config$/', $path)) return false;
@@ -27,7 +25,7 @@ class Mirror extends BaseCommand
 			symlink($path, preg_replace('/^(.*\/)([^\/]+)(\/app\/.*)$/', '$1mirror$3', $path));
 
 		foreach(array_filter($root, function($path) {
-			if(1 === preg_match('/^.*\/app\/Config\/(?:Constants|Paths|Registrar)\.php$/', $path)) return false;
+			if(1 === preg_match('/^.*\/app\/Config\/(?:Autoload|Constants|Paths|Registrar|Routes|Security)\.php$/', $path)) return false;
 			if(1 === preg_match('/^.*\/app\/Config\/[^\/]+$/', $path)) return true;
 			return false;
 		}) as $path)
@@ -41,7 +39,7 @@ class Mirror extends BaseCommand
 			symlink($path, preg_replace('/^(.*\/)([^\/]+)(\/public\/.*)$/', '$1mirror$3', $path));
 
 		foreach(array_filter($root, function($path) {
-			if(1 === preg_match('/^.*\/app\/Config\/(?:Constants|Paths|Registrar)\.php$/', $path)) return true;
+			if(1 === preg_match('/^.*\/app\/Config\/(?:Autoload|Constants|Paths|Registrar|Routes|Security)\.php$/', $path)) return true;
 			return false;
 		}) as $path)
 			copy($path, preg_replace('/^(.*\/)([^\/]+)(\/app\/.*)$/', '$1mirror$3', $path));
