@@ -48,6 +48,7 @@ USER apache
 # Create subdirectories
 RUN mkdir -p $ci_subdir/modules/master/src
 RUN mkdir -p $ci_subdir/app/Config
+RUN mkdir -p $ci_subdir/app/Controllers
 RUN mkdir -p $ci_subdir/public
 
 # Composer install CodeIgniter 4 framework
@@ -70,6 +71,7 @@ RUN cp -R vendor/codeigniter4/framework/app/Config/Constants.php $ci_subdir/app/
 RUN cp -R vendor/codeigniter4/framework/app/Config/Paths.php $ci_subdir/app/Config/.
 RUN echo -e "<?php\n\n" > $ci_subdir/app/Config/Routes.php
 RUN cp -R vendor/codeigniter4/framework/app/Config/Security.php $ci_subdir/app/Config/.
+RUN cp -R vendor/codeigniter4/framework/app/Controllers/BaseController.php $ci_subdir/app/Controllers/.
 RUN cp -R vendor/codeigniter4/framework/public/index.php $ci_subdir/public/.
 
 # Symlink framework app/ files
@@ -105,6 +107,9 @@ RUN sed -i "s/vendor\/autoload.php/..\/vendor\/autoload.php/" $ci_subdir/app/Con
 
 # Modify Autoload with Master module namespace
 RUN sed -i "s/APP_NAMESPACE => APPPATH,/APP_NAMESPACE => APPPATH,\n\t\t'Modules\\\\Master' => ROOTPATH . 'modules\/master\/src',/" $ci_subdir/app/Config/Autoload.php
+
+# Modify BaseController to apply nonces and CDNs
+RUN sed -i "s/'session'/'session');\n\n\t\t\$csp = \$response->getCSP();\n\n\t\t\$csp->addStyleSrcElem(\"nonce-\{\$csp->getStyleNonce()\}\");\n\t\t\$csp->addScriptSrcElem(\"nonce-\{\$csp->getScriptNonce()\}\");\n\n\t\t\$csp->addStyleSrcElem('cdn.jsdelivr.net');\n\t\t\$csp->addConnectSrc('cdn.jsdelivr.net'/" $ci_subdir/app/Controllers/BaseController.php
 
 # Change environment to development
 RUN sed -i "s/# CI_ENVIRONMENT = production/CI_ENVIRONMENT = ${ci_environment}/" $ci_subdir/.env
