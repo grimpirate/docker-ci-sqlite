@@ -104,7 +104,7 @@ class Registrar
 			'sandbox' => null,
 			'styleNonceTag' => '{csp-style-nonce}',
 			'scriptNonceTag' => '{csp-script-nonce}',
-			'autoNonce' => false,
+			'autoNonce' => true,	// Set this way for generic install to permit generic home page view, should be switched to false and use csp_script_nonce() or csp_style_nonce() functions, respectively
 		];
 	}
 
