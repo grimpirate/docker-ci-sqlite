@@ -11,15 +11,24 @@ ARG ci_baseurl=http://localhost
 ARG ci_environment=production
 
 # Install requirements for Codeigniter and SQLite
-RUN apk add --no-cache nano tzdata sqlite composer php-intl php-ctype php-sqlite3 php-tokenizer php-session apache2-ssl openssl
+RUN apk add --no-cache nano tzdata sqlite composer php-intl php-ctype php-sqlite3 php-tokenizer php-session
 # Needed for grimpirate/halberd package
 RUN apk add php-xmlwriter
-RUN\
+RUN \
 	if [ "${user}" == "apache" ]; then \
-		apk add --no-cache apache2 php-apache2; \
+		apk add --no-cache apache2 php-apache2 apache2-ssl openssl; \
+# Fully qualified ServerName
+		sed -i "s/#ServerName.*/ServerName 172.17.0.2/" /etc/apache2/httpd.conf; \
+# Enable mod_rewrite in apache (for .htaccess to function correctly)
+		sed -i "s/#LoadModule rewrite_module/LoadModule rewrite_module/" /etc/apache2/httpd.conf; \
 	else \
 		apk add --no-cache nginx php php-fpm; \
+		mkdir -p /etc/nginx/http.d; \
 	fi
+
+# Copy configuration files for web servers
+ADD apache/localhost.conf /etc/apache2/conf.d/localhost.conf
+ADD nginx/default.conf /etc/nginx/http.d/default.conf
 
 # Clear Alpine package cache
 RUN rm -rf /var/cache/apk/*
@@ -33,14 +42,6 @@ RUN sed -i "s/memory_limit = 128M/memory_limit = 1024M/" /etc/php*/php.ini
 # Enable JIT compiling
 RUN sed -i "s/;opcache.enable=1/opcache.enable=1\nopcache.jit_buffer_size=128M\nopcache.jit=tracing/" /etc/php*/php.ini
 
-RUN\
-	if [ "${user}" == "apache" ]; then \
-# Fully qualified ServerName
-		sed -i "s/#ServerName.*/ServerName 172.17.0.2/" /etc/apache2/httpd.conf; \
-# Enable mod_rewrite in apache (for .htaccess to function correctly)
-		sed -i "s/#LoadModule rewrite_module/LoadModule rewrite_module/" /etc/apache2/httpd.conf; \
-	fi
-
 # <CodeIgniter 4 Default Setup>
 
 WORKDIR /var/www/localhost/htdocs
@@ -50,11 +51,6 @@ RUN rm -rf *
 
 # Change htdocs folder group:user
 RUN chown $user:$user /var/www/localhost/htdocs
-
-# Copy configuration files for web servers
-ADD apache/localhost.conf /etc/apache2/conf.d/localhost.conf
-RUN mkdir -p /etc/nginx/http.d
-ADD nginx/default.conf /etc/nginx/http.d/default.conf
 
 # Generate a self-signed certificate for HTTPS
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
@@ -178,10 +174,8 @@ RUN rm -rf $ci_subdir/app/Models
 RUN rm -rf $ci_subdir/app/ThirdParty
 RUN rm -rf $ci_subdir/app/Views
 
-RUN\
-	if [ "${user}" == "nginx" ]; then \
-		chmod -R 0777 /var/www/localhost/htdocs/writable; \
-	fi
+# Specific to nginx
+RUN chmod -R 0777 /var/www/localhost/htdocs/writable
 
 # </Custom Site Setup>
 
@@ -195,6 +189,6 @@ ENV GRIMUSER=$user
 # Run configure.sh
 ENTRYPOINT ["sh", "-c", "if [ \"$GRIMUSER\" == 'apache' ]; then httpd -k start & tail -f /dev/null; else php-fpm83 & nginx -g 'daemon off;'; fi"]
 
-# Expose port 80 for external access
+# Expose port 80 and 443 for external access
 EXPOSE 80
 EXPOSE 443
