@@ -8,7 +8,7 @@ ARG tz_country=America
 ARG tz_city=New_York
 ARG ci_subdir=sub
 ARG ci_baseurl=http://localhost
-ARG ci_environment=development
+ARG ci_environment=production
 
 # Install requirements for Codeigniter and SQLite
 RUN apk add --no-cache nano tzdata sqlite composer php-intl php-ctype php-sqlite3 php-tokenizer php-session apache2-ssl openssl
@@ -30,6 +30,8 @@ RUN echo "${tz_country}/${tz_city}" > /etc/timezone
 RUN sed -i "s/;date.timezone =/date.timezone = \"${tz_country}\/${tz_city}\"/" /etc/php*/php.ini
 # Increase PHP memory limit
 RUN sed -i "s/memory_limit = 128M/memory_limit = 1024M/" /etc/php*/php.ini
+# Enable JIT compiling
+RUN sed -i "s/;opcache.enable=1/opcache.enable=1\nopcache.jit_buffer_size=128M\nopcache.jit=tracing/" /etc/php*/php.ini
 
 RUN\
 	if [ "${user}" == "apache" ]; then \
