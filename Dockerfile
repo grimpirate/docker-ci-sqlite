@@ -52,11 +52,8 @@ RUN rm -rf *
 RUN chown $user:$user /var/www/localhost/htdocs
 
 # Copy configuration files for web servers
-RUN\
-	if [ "${user}" != "apache" ]; then \
-		mkdir -p /etc/nginx/http.d; \
-	fi
 ADD apache/localhost.conf /etc/apache2/conf.d/localhost.conf
+RUN mkdir -p /etc/nginx/http.d
 ADD nginx/default.conf /etc/nginx/http.d/default.conf
 
 # Generate a self-signed certificate for HTTPS
