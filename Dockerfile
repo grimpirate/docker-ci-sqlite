@@ -11,12 +11,12 @@ ARG ci_baseurl=http://localhost
 ARG ci_environment=production
 
 # Install requirements for Codeigniter and SQLite
-RUN apk add --no-cache nano tzdata sqlite composer php-intl php-ctype php-sqlite3 php-tokenizer php-session
+RUN apk add --no-cache nano tzdata sqlite composer php-intl php-ctype php-sqlite3 php-tokenizer php-session openssl
 # Needed for grimpirate/halberd package
 RUN apk add php-xmlwriter
 RUN \
 	if [ "${user}" == "apache" ]; then \
-		apk add --no-cache apache2 php-apache2 apache2-ssl openssl; \
+		apk add --no-cache apache2 php-apache2 apache2-ssl; \
 # Fully qualified ServerName
 		sed -i "s/#ServerName.*/ServerName 172.17.0.2/" /etc/apache2/httpd.conf; \
 # Enable mod_rewrite in apache (for .htaccess to function correctly)
@@ -54,7 +54,7 @@ RUN rm -rf *
 RUN chown $user:$user /var/www/localhost/htdocs
 
 # Generate a self-signed certificate for HTTPS
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+RUN openssl req -x509 -nodes -newkey rsa:2048 \
 	-keyout /etc/ssl/private/localhost.key \
 	-out /etc/ssl/certs/localhost.crt \
 	-subj "/C=US/ST=State/L=City/O=Organization/OU=Development/CN=localhost"
@@ -195,7 +195,7 @@ VOLUME ["/var/www/localhost/htdocs"]
 ENV GRIMUSER=$user
 
 # Run configure.sh
-ENTRYPOINT ["sh", "-c", "if [ \"$GRIMUSER\" == 'apache' ]; then httpd -k start & tail -f /dev/null; else php-fpm83 & nginx -g 'daemon off;'; fi"]
+ENTRYPOINT ["sh", "-c", "if [ \"$GRIMUSER\" == 'apache' ]; then httpd -k start & tail -f /dev/null; else $(ls /usr/sbin/php-fpm* 2>/dev/null | head -n 1) & nginx -g 'daemon off;'; fi"]
 
 # Expose port 80 and 443 for external access
 EXPOSE 80
