@@ -39,8 +39,9 @@ RUN echo "${tz_country}/${tz_city}" > /etc/timezone
 RUN sed -i "s/;date.timezone =/date.timezone = \"${tz_country}\/${tz_city}\"/" /etc/php*/php.ini
 # Increase PHP memory limit
 RUN sed -i "s/memory_limit = 128M/memory_limit = 1024M/" /etc/php*/php.ini
-# Enable JIT compiling
+# Enable/configure standard OPCache and JIT
 RUN sed -i "s/;opcache.enable=1/opcache.enable=1\nopcache.jit_buffer_size=128M\nopcache.jit=tracing/" /etc/php*/php.ini
+RUN sed -i "s/;opcache.memory_consumption=128/opcache.memory_consumption=128/" /etc/php*/php.ini
 
 # <CodeIgniter 4 Default Setup>
 
@@ -62,7 +63,7 @@ USER $user
 
 # Create subdirectories
 RUN mkdir -p $ci_subdir/modules/master/src
-RUN mkdir -p $ci_subdir/app/Config
+RUN mkdir -p $ci_subdir/app/Config/Boot
 RUN mkdir -p $ci_subdir/app/Controllers
 RUN mkdir -p $ci_subdir/public
 
@@ -81,6 +82,7 @@ RUN composer require codeigniter4/framework
 ### MODIFYING VENDOR FILES DIRECTLY IS DANGEROUS!!! ###
 
 # Copy files from framework into subdirectory
+RUN cp -R vendor/codeigniter4/framework/app/Config/Boot/production.php $ci_subdir/app/Config/Boot/.
 RUN cp -R vendor/codeigniter4/framework/app/Config/Autoload.php $ci_subdir/app/Config/.
 RUN cp -R vendor/codeigniter4/framework/app/Config/Constants.php $ci_subdir/app/Config/.
 RUN cp -R vendor/codeigniter4/framework/app/Config/Paths.php $ci_subdir/app/Config/.
@@ -96,6 +98,8 @@ RUN find /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/ -mindepth 
 # Symlink framework app/Config/ files
 WORKDIR /var/www/localhost/htdocs/$ci_subdir/app/Config
 RUN find /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/ -mindepth 1 -maxdepth 1 -exec ln -s "{}" . ';'
+WORKDIR /var/www/localhost/htdocs/$ci_subdir/app/Config/Boot
+RUN find /var/www/localhost/htdocs/vendor/codeigniter4/framework/app/Config/ -mindepth 2 -maxdepth 2 -exec ln -s "{}" . ';'
 
 # Symlink framework public/ files
 WORKDIR /var/www/localhost/htdocs/$ci_subdir/public
@@ -112,6 +116,10 @@ RUN cp -R vendor/codeigniter4/framework/writable .
 # Copy spark and .env file into subdirectory (ignoring phpunit.xml.dist)
 RUN cp vendor/codeigniter4/framework/env $ci_subdir/.env
 RUN cp vendor/codeigniter4/framework/spark $ci_subdir/.
+
+# Modify production error settings
+RUN sed -Ei "1,/\/\/ (error_reporting.*)/{s/\/\/ (error_reporting.*)/\1/}" $ci_subdir/app/Config/Boot/production.php
+RUN sed -Ei "1,/(error_reporting.*)/{s/(error_reporting.*)/\/\/ \1/}" $ci_subdir/app/Config/Boot/production.php
 
 # Modify default app paths to be one level higher
 RUN sed -i "s/\/..\/..\/system/\/..\/..\/..\/vendor\/codeigniter4\/framework\/system/" $ci_subdir/app/Config/Paths.php
