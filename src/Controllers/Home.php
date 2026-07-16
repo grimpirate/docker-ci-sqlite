@@ -10,6 +10,14 @@ class Home extends \App\Controllers\BaseController
 	public function index(): string
 	{
 		return CheckPhpIni::run(false);
+		
 		//return view('Modules\Master\Views\welcome_message');
+
+		// Requires CPSEnabled => false in Config/Registrar.php
+		return view('Modules\Master\Views\flems', [
+			'lang' => $this->request->getLocale(),
+			'title' => 'Sandbox',
+			'description' => 'Sandbox powered by Flems.io'
+		]);
 	}
 }
