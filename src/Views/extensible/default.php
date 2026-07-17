@@ -1,5 +1,5 @@
 <?php helper('html'); ?>
-<?= doctype('html5') ?>
+<?= doctype() ?>
 <html lang="<?= $lang ?>">
 <head>
 
