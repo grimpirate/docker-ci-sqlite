@@ -11,7 +11,7 @@ class Home extends \App\Controllers\BaseController
 	{
 		return CheckPhpIni::run(false);
 		
-		//return view('Modules\Master\Views\welcome_message');
+		//return view('welcome_message');
 
 		// Requires CPSEnabled => false in Config/Registrar.php
 		return view('Modules\Master\Views\flems', [
