@@ -108,18 +108,4 @@ class Registrar
 			'autoNonce' => true,	// Set this way for generic install to permit generic home page view, should be switched to false and use csp_script_nonce() or csp_style_nonce() functions, respectively
 		];
 	}
-
-	public static function Exceptions(): array
-	{
-		return [
-			'errorViewPath' => ROOTPATH . 'modules/master/src/Views/errors',
-		];
-	}
-
-	public static function Routing(): array
-	{
-		return [
-			'defaultNamespace' => 'Modules\Master\Controllers',
-		];
-	}
 }
