@@ -152,7 +152,11 @@ RUN composer require codeigniter4/shield:dev-develop
 # RUN composer require guzzlehttp/guzzle
 
 # Composer install HTML minifier
-RUN composer require voku/html-min:^5.0
+#RUN composer require voku/html-min:^5.0
+RUN composer require akankov/html-min
+
+# Composer install CSS/JS minifier
+RUN composer require matthiasmullie/minify
 
 # Copy all environment variables to .env file
 RUN echo "docker.db_name=${db_name}.db">> $ci_subdir/.env
