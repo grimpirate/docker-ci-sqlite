@@ -19,10 +19,6 @@ RUN apk add --no-cache php-simplexml php-xml php-dom
 RUN \
 	if [ "${user}" == "apache" ]; then \
 		apk add --no-cache apache2 php-apache2 apache2-ssl; \
-# Fully qualified ServerName
-#		sed -i "s/#ServerName.*/ServerName 172.17.0.2/" /etc/apache2/httpd.conf; \
-# Enable mod_rewrite in apache (for .htaccess to function correctly)
-#		sed -i "s/#LoadModule rewrite_module/LoadModule rewrite_module/" /etc/apache2/httpd.conf; \
 	else \
 		apk add --no-cache nginx php php-fpm; \
 		mkdir -p /etc/nginx/http.d; \
