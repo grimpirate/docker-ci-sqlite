@@ -10,7 +10,7 @@
 
 <title><?= $this->renderSection('title') ?></title>
 
-<base href="<?= site_url() ?>">
+<base href="<?= base_url('', '') ?>">
 
 <?= link_tag('/favicon.svg', 'icon', 'image/svg+xml') ?>
 <?= link_tag('css/main.css') ?>
