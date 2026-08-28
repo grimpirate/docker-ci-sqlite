@@ -13,7 +13,9 @@ ARG ci_environment=production
 # Install requirements for Codeigniter and SQLite
 RUN apk add --no-cache nano tzdata sqlite composer php-intl php-ctype php-sqlite3 php-tokenizer php-session openssl
 # Needed for grimpirate/halberd package
-RUN apk add php-xmlwriter
+RUN apk add --no-cache php-xmlwriter
+# Needed for voku/html-min package
+RUN apk add --no-cache php-simplexml php-xml php-dom
 RUN \
 	if [ "${user}" == "apache" ]; then \
 		apk add --no-cache apache2 php-apache2 apache2-ssl; \
@@ -146,7 +148,11 @@ RUN composer require codeigniter4/shield:dev-develop
 
 # <Custom Site Setup>
 
+# Composer install Guzzle library
 # RUN composer require guzzlehttp/guzzle
+
+# Composer install HTML minifier
+RUN composer require voku/html-min:^5.0
 
 # Copy all environment variables to .env file
 RUN echo "docker.db_name=${db_name}.db">> $ci_subdir/.env
