@@ -57,7 +57,7 @@ body
 </html>`
 			},
 			{ name: '.js', content:
-`m.render(document.body, m('h1', 'Hello world'))`
+`m.render(document.body, m('h1', 'Hello world'));`
 			},
 			{ name: '.css', content:
 `/* https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API */
