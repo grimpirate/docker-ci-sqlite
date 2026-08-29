@@ -55,7 +55,11 @@ RUN chown $user:$user /var/www/localhost/htdocs
 RUN openssl req -x509 -nodes -newkey rsa:2048 \
 	-keyout /etc/ssl/private/localhost.key \
 	-out /etc/ssl/certs/localhost.crt \
-	-subj "/C=US/ST=State/L=City/O=Organization/OU=Development/CN=localhost"
+	-subj "/C=US/ST=State/L=City/O=Organization/OU=Development/CN=localhost" \
+	-days 365 \
+	-addext "subjectAltName = DNS:localhost, IP:172.17.0.2" \
+	-addext "basicConstraints=CA:FALSE" \
+	-addext "extendedKeyUsage=serverAuth"
 
 USER $user
 
