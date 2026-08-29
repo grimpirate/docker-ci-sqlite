@@ -21,11 +21,11 @@ RUN \
 		apk add --no-cache apache2 php-apache2 apache2-ssl; \
 	else \
 		apk add --no-cache nginx php php-fpm; \
-		mkdir -p /etc/nginx/http.d; \
 	fi
 
 # Copy configuration files for web servers
 ADD apache/localhost.conf /etc/apache2/conf.d/localhost.conf
+RUN mkdir -p /etc/nginx/http.d
 ADD nginx/default.conf /etc/nginx/http.d/default.conf
 
 # Clear Alpine package cache
