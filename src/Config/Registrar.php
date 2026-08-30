@@ -108,13 +108,4 @@ class Registrar
 			'autoNonce' => true,	// Set this way for generic install to permit generic home page view, should be switched to false and use csp_script_nonce() or csp_style_nonce() functions, respectively
 		];
 	}
-
-	public static function View(): array
-	{
-		return [
-			'decorators' => [
-				'Modules\Master\Views\Decorators\MinifyDecorator',
-			],
-		];
-	}
 }
