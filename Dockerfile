@@ -11,7 +11,7 @@ ARG ci_baseurl=http://localhost
 ARG ci_environment=production
 
 # Install requirements for Codeigniter and SQLite
-RUN apk add --no-cache nano tzdata sqlite composer php-intl php-ctype php-sqlite3 php-tokenizer php-session openssl
+RUN apk add --no-cache git nano tzdata sqlite composer php-intl php-ctype php-sqlite3 php-tokenizer php-session openssl
 # Needed for grimpirate/halberd package
 RUN apk add --no-cache php-xmlwriter
 # Needed for voku/html-min package
@@ -129,7 +129,7 @@ RUN sed -i "s/\/..\/..\/writable/\/..\/..\/..\/writable/" $ci_subdir/app/Config/
 RUN sed -i "s/vendor\/autoload.php/..\/vendor\/autoload.php/" $ci_subdir/app/Config/Constants.php
 
 # Modify Autoload with Master module namespace
-RUN sed -i "s/APP_NAMESPACE => APPPATH,/APP_NAMESPACE => APPPATH,\n\t\t'Modules\\\\Master' => ROOTPATH . 'modules\/master\/src',/" $ci_subdir/app/Config/Autoload.php
+RUN sed -i "s/APP_NAMESPACE => APPPATH,/APP_NAMESPACE => APPPATH,\n\t\t'Modules\\\\Master' => ROOTPATH . 'modules\/master\/src',\n\t\t'Modules\\\\Minify' => ROOTPATH . 'modules\/minify\/src',/" $ci_subdir/app/Config/Autoload.php
 
 # Modify BaseController to apply nonces and CDNs
 #RUN sed -i "s/'session'/'session');\n\n\t\t\$csp = \$response->getCSP();\n\n\t\t\$csp->addStyleSrcElem(\"nonce-\{\$csp->getStyleNonce()\}\");\n\t\t\$csp->addScriptSrcElem(\"nonce-\{\$csp->getScriptNonce()\}\");\n\n\t\t\$csp->addStyleSrcElem('cdn.jsdelivr.net');\n\t\t\$csp->addConnectSrc('cdn.jsdelivr.net'/" $ci_subdir/app/Controllers/BaseController.php
@@ -151,12 +151,23 @@ RUN composer require codeigniter4/shield:dev-develop
 # Composer install Guzzle library
 # RUN composer require guzzlehttp/guzzle
 
-# Composer install HTML minifier
+### Composer install HTML minifier ###
+
 #RUN composer require voku/html-min:^5.0
 RUN composer require akankov/html-min
-
 # Composer install CSS/JS minifier
 RUN composer require matthiasmullie/minify
+
+WORKDIR /var/www/localhost/htdocs/$ci_subdir
+
+RUN git clone --depth 1 --branch main --single-branch https://github.com/grimpirate/ci4-module-minify
+RUN mkdir -p modules/minify
+RUN mv ci4-module-minify/src modules/minify
+RUN rm -rf ci4-module-minify
+
+### Composer install HTML minifier ###
+
+WORKDIR /var/www/localhost/htdocs
 
 # Copy all environment variables to .env file
 RUN echo "docker.db_name=${db_name}.db">> $ci_subdir/.env
