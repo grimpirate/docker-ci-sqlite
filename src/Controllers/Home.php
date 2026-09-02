@@ -13,7 +13,7 @@ class Home extends \App\Controllers\BaseController
 		
 		//return view('welcome_message');
 
-		// Requires CPSEnabled => false in Config/Registrar.php
+		// Requires CSPEnabled => false in Config/Registrar.php
 		return view('Modules\Master\Views\flems', [
 			'lang' => $this->request->getLocale(),
 			'title' => 'Sandbox',
